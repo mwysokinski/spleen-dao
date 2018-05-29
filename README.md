@@ -19,7 +19,7 @@ Disclaimer: Project is in early stage.
       
 
     ds.withConnection { implicit connection =>
-      Query.execute(sql, MySqlTypeMapper)
+      ds.execute(sql, MySqlTypeMapper)
     } foreach (res => res.print)
 
 ```
@@ -33,10 +33,10 @@ Disclaimer: Project is in early stage.
         |VALUES (:id, :name)
       """.stripMargin
       
+    val params = Map("id" -> 1, "name" -> "Marcin")
 
     ds.withConnection { implicit connection =>
-      val params = Map("id" -> 1, "name" -> "Marcin")
-      Modification.execute(sql, params)
+      ds.execute(sql, params)
     } 
 
 ```
@@ -51,10 +51,10 @@ Disclaimer: Project is in early stage.
         |WHERE `id` = :id;
       """.stripMargin
       
+    val params = Map("id" -> 1, "name" -> "Roman")
 
     ds.withConnection { implicit connection =>
-      val params = Map("id" -> 1, "name" -> "Roman")
-      Modification.execute(sql, params)
+      ds.execute(sql, params)
     }
 
 ```
