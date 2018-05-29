@@ -19,7 +19,7 @@ Disclaimer: Project is in early stage.
       
 
     ds.withConnection { implicit connection =>
-      ds.execute(sql, MySqlTypeMapper)
+      ds.execute(sql)
     } foreach (res => res.print)
 
 ```
