@@ -63,12 +63,6 @@ object Query {
     }
   }
 
-  def fromByteArray(array: Array[Byte]): UUID = {
-    val bb: ByteBuffer = ByteBuffer.wrap(array)
-    new UUID(bb.getLong(), bb.getLong())
-  }
-
-
   def rowValues(resultSet: ResultSet, columns: RowColumns, mapper: TypeMapper): RowValues = {
     columns.map { column =>
       mapper.convert(resultSet, column)
