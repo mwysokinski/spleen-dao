@@ -1,19 +1,8 @@
-package io.lubit.spleendao
+package io.lubit.spleendao.mappers
 
-import java.nio.ByteBuffer
 import java.sql.ResultSet
-import java.util.UUID
 
-trait TypeMapper {
-  def convert(resultSet: ResultSet, column: Query.Column): Any
-
-  def fromByteArray(array: Array[Byte]): UUID = {
-    val bb: ByteBuffer = ByteBuffer.wrap(array)
-    new UUID(bb.getLong(), bb.getLong())
-  }
-
-}
-
+import io.lubit.spleendao.Query
 
 object MySqlTypeMapper extends TypeMapper {
 

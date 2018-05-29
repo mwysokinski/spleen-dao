@@ -1,8 +1,8 @@
 package io.lubit.spleendao
 
-import java.nio.ByteBuffer
 import java.sql.{Connection, ResultSet}
-import java.util.UUID
+
+import io.lubit.spleendao.mappers.TypeMapper
 
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
@@ -33,7 +33,7 @@ object Query {
 
   }
 
-  def execute(sql: String, mapper: TypeMapper)(implicit connection: Connection): QueryResult = {
+  def execute(sql: String)(implicit connection: Connection, mapper: TypeMapper): QueryResult = {
 
     val statement = connection.createStatement()
     val resultSet = statement.executeQuery(sql)

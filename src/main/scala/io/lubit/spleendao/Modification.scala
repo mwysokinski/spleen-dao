@@ -15,7 +15,6 @@ object Modification {
 
   def execute(sql: String, params: Params)(implicit connection: Connection): Int = {
 
-
     val sqlNoParams = sql.replaceAll(ParamsPattern.regex, "?")
     val statement = connection.prepareStatement(sqlNoParams)
 
