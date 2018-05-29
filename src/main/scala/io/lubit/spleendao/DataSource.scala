@@ -1,7 +1,7 @@
 package io.lubit.spleendao
 
 import java.sql.Connection
-import java.util.concurrent.Executors
+import java.util.concurrent.{Executors, TimeUnit}
 
 import org.apache.commons.dbcp2.BasicDataSource
 import DataSource._
@@ -26,13 +26,20 @@ class DataSource(config: DataSourceConfig) {
 
   private val pool = new ConnectionPool(config)
 
-  implicit val ec = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(config.size))
+  implicit val ec = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(config.size))
 
   def withConnection[T](body: Connection => T): Future[T] = Future {
     val connection = pool.getConnection
     val res = body(connection)
     connection.close()
     res
+  }
+
+  def shutdown: Unit = {
+    Thread.sleep(1000)
+    ec.shutdown()
+    ec.awaitTermination(30, TimeUnit.SECONDS)
+    pool.close()
   }
 
 
