@@ -8,6 +8,7 @@ import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
 
 case class Query(sql: String, mapper: TypeMapper, params: Option[Params] = None) {
+
   def execute(implicit connection: Connection) = Query.execute(this)
 
   def executeUpdate(implicit connection: Connection) = Query.executeUpdate(this)
@@ -31,7 +32,13 @@ object Query {
   }
 
 
-  case class Column(index: Int, name: String, tableName: String, label: String, sqlType: String)
+  case class Column(index: Int,
+                    name: String,
+                    tableName: String,
+                    label: String,
+                    sqlType: String,
+                    nullable: Boolean,
+                    precision: Long)
 
   case class QueryResult(columns: RowColumns, values: List[RowValues]) {
 
@@ -88,22 +95,29 @@ object Query {
     val cnt = rsmd.getColumnCount
 
     (1 to cnt).map { i =>
-      val name = rsmd.getColumnName(i)
-      val typeName = rsmd.getColumnTypeName(i)
-
       Column(
         index = i,
-        name = name,
+        name = rsmd.getColumnName(i),
         tableName = rsmd.getTableName(i),
         label = rsmd.getColumnLabel(i),
-        sqlType = typeName
+        sqlType = rsmd.getColumnTypeName(i),
+        nullable = rsmd.isNullable(i) == 1,
+        precision = rsmd.getPrecision(i)
       )
+    }
+  }
+
+  def wrapResult(resultSet: ResultSet, column: Query.Column, result: Any): Any = {
+    if (column.nullable) {
+      if (resultSet.wasNull()) None else Some(result)
+    } else {
+      result
     }
   }
 
   def rowValues(resultSet: ResultSet, columns: RowColumns, mapper: TypeMapper): RowValues = {
     columns.map { column =>
-      mapper.convert(resultSet, column)
+      wrapResult(resultSet, column, mapper.convert(resultSet, column))
     }
   }
 

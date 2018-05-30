@@ -7,6 +7,7 @@ import java.util.UUID
 import io.lubit.spleendao.db.mysql.MySqlTypeMapper
 
 trait TypeMapper {
+
   def convert(resultSet: ResultSet, column: Query.Column): Any
 
   def fromByteArray(array: Array[Byte]): UUID = {
