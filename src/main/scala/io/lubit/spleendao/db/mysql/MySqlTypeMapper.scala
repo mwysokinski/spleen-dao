@@ -1,8 +1,8 @@
-package io.lubit.spleendao.mappers
+package io.lubit.spleendao.db.mysql
 
 import java.sql.ResultSet
 
-import io.lubit.spleendao.Query
+import io.lubit.spleendao.{Query, TypeMapper}
 
 object MySqlTypeMapper extends TypeMapper {
 

@@ -1,10 +1,10 @@
-package io.lubit.spleendao.mappers
+package io.lubit.spleendao
 
 import java.nio.ByteBuffer
 import java.sql.ResultSet
 import java.util.UUID
 
-import io.lubit.spleendao.{DatabaseType, DatabaseTypes, Query}
+import io.lubit.spleendao.db.mysql.MySqlTypeMapper
 
 trait TypeMapper {
   def convert(resultSet: ResultSet, column: Query.Column): Any

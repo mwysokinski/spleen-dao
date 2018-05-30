@@ -10,16 +10,37 @@ Disclaimer: Project is in early stage.
 ```
     val ds = new DataSource(config)
     
-    val sql =
+    val query = ds.query(
       """
         |SELECT *
         |FROM test.user
         |limit 10
-      """.stripMargin
+      """.stripMargin)
       
 
     ds.withConnection { implicit connection =>
-      ds.execute(sql)
+      query.execute
+    } foreach (res => res.print)
+
+```
+
+### Query with params (select) usage
+```
+    val ds = new DataSource(config)
+    
+    val query = ds.query(
+      """
+        |SELECT *
+        |FROM test.user
+        |WHERE email like :email
+        |limit 10
+      """.stripMargin)
+      
+
+    ds.withConnection { implicit connection =>
+      query
+        .withParams("email" -> "roberta%")
+        .execute
     } foreach (res => res.print)
 
 ```
@@ -27,16 +48,14 @@ Disclaimer: Project is in early stage.
 ### Modification (insert) usage
 
 ```
-    val sql =
+    val query = ds.query(
       """
         |INSERT INTO `test`.`user` (`id`,`name`)
         |VALUES (:id, :name)
-      """.stripMargin
+      """.stripMargin)
       
-    val params = Map("id" -> 1, "name" -> "Marcin")
-
     ds.withConnection { implicit connection =>
-      ds.execute(sql, params)
+      query.withParams("id" -> 1, "name" -> "Marcin").executeUpdate
     } 
 
 ```
@@ -44,17 +63,15 @@ Disclaimer: Project is in early stage.
 ### Modification (update) usage
 
 ```
-    val sql =
+    val query = ds.query(
       """
         |UPDATE `test`.`user`
         |SET `name` = :name
         |WHERE `id` = :id;
-      """.stripMargin
+      """.stripMargin)
       
-    val params = Map("id" -> 1, "name" -> "Roman")
-
     ds.withConnection { implicit connection =>
-      ds.execute(sql, params)
+      query.withParams("id" -> 1, "name" -> "Roman").executeUpdate
     }
 
 ```

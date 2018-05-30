@@ -3,10 +3,8 @@ package io.lubit.spleendao
 import java.sql.Connection
 import java.util.concurrent.{Executors, TimeUnit}
 
+import io.lubit.spleendao.DataSource._
 import org.apache.commons.dbcp2.BasicDataSource
-import DataSource._
-import io.lubit.spleendao.Modification.Params
-import io.lubit.spleendao.mappers.TypeMapper
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,9 +42,7 @@ class DataSource(config: DataSourceConfig) {
     res
   }
 
-  def execute(sql: String)(implicit connection: Connection) = Query.execute(sql)
-
-  def execute(sql: String, params: Params)(implicit connection: Connection): Int = Modification.execute(sql, params)
+  def query(sql: String): Query = Query(sql, mapper)
 
   def shutdown: Unit = {
     Thread.sleep(1000)
