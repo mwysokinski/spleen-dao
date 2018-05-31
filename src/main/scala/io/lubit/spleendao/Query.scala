@@ -9,7 +9,7 @@ import scala.collection.mutable.ListBuffer
 
 case class Query[T](sql: String, mapper: RowMapper[T], params: Option[Params] = None) {
 
-  def execute(implicit connection: Connection): QueryResult[T] = {
+  def result(implicit connection: Connection): QueryResult[T] = {
     val resultSet = statement.executeQuery()
     val columns = rowColumns(resultSet)
 
@@ -17,6 +17,13 @@ case class Query[T](sql: String, mapper: RowMapper[T], params: Option[Params] = 
       columns = columns,
       values = resultSetValues(resultSet, columns, mapper)
     )
+  }
+
+  def values(implicit connection: Connection): List[T] = {
+    val resultSet = statement.executeQuery()
+    val columns = rowColumns(resultSet)
+
+    resultSetValues(resultSet, columns, mapper)
   }
 
   def executeUpdate(implicit connection: Connection): Int = statement.executeUpdate

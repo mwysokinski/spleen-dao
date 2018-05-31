@@ -1,4 +1,4 @@
 .idea
-/src/test/scala/io/lubit/spleendao/integration
+/src/test/scala/io/lubit/spleendao/integration/**
 /target
 /project/target

@@ -19,7 +19,7 @@ Disclaimer: Project is in early stage.
       
 
     ds.withConnection { implicit connection =>
-      query.execute
+      query.result
     } foreach (res => res.print)
 
 ```
@@ -40,7 +40,7 @@ Disclaimer: Project is in early stage.
     ds.withConnection { implicit connection =>
       query
         .withParams("email" -> "roberta%")
-        .execute
+        .result
     } foreach (res => res.print)
 
 ```
