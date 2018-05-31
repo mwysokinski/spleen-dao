@@ -1,6 +1,7 @@
 package io.lubit.spleendao
 
 import io.lubit.spleendao.db.mysql.MySqlQueries
+import io.lubit.spleendao.db.postgresql.PostgreSqlQueries
 import io.lubit.spleendao.dto.InformationSchemaDto
 
 trait DbSpecificQueries {
@@ -13,6 +14,7 @@ object DbSpecificQueries {
 
   def apply(databaseType: DatabaseType): DbSpecificQueries = databaseType match {
     case DatabaseTypes.MySQL => MySqlQueries
+    case DatabaseTypes.PostgreSQL => PostgreSqlQueries
 
     case other => throw new Exception(s"DbSpecificQueries for ${other} not defined!")
   }

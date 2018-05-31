@@ -7,6 +7,7 @@ import java.util.UUID
 import io.lubit.spleendao.ColumnMapper.DefaultColumnMapper
 import io.lubit.spleendao.Query.{RowColumns, RowValues}
 import io.lubit.spleendao.db.mysql.MySqlColumnMapper
+import io.lubit.spleendao.db.postgresql.PostgreSqlColumnMapper
 import io.lubit.spleendao.dto.InformationSchemaDto
 
 trait ColumnMapper[T] {
@@ -49,6 +50,7 @@ object ColumnMapper {
 
   def apply(databaseType: DatabaseType): DefaultColumnMapper = databaseType match {
     case DatabaseTypes.MySQL => MySqlColumnMapper
+    case DatabaseTypes.PostgreSQL => PostgreSqlColumnMapper
 
     case other => throw new Exception(s"DefaultColumnMapper for ${other} not defined!")
   }

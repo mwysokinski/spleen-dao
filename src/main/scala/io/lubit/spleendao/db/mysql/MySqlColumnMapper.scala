@@ -11,7 +11,7 @@ object MySqlColumnMapper extends DefaultColumnMapper {
 
   val BinaryToUUID = true
 
-  override def convert(resultSet: ResultSet, column: Query.Column): Any = column.sqlType match {
+  override def convert(resultSet: ResultSet, column: Query.Column): Any = column.sqlType.toUpperCase match {
     case "BINARY" =>
       val res = resultSet.getBytes(column.index)
 
