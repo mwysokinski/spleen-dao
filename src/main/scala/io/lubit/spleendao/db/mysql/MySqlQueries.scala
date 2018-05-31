@@ -1,12 +1,15 @@
 package io.lubit.spleendao.db.mysql
 
-import io.lubit.spleendao.{DbSpecificQueries, Query}
+import io.lubit.spleendao.Query.RowValues
+import io.lubit.spleendao.{DbSpecificQueries, DefaultRowMapper, Query}
 
 object MySqlQueries extends DbSpecificQueries {
 
-  def query(sql: String) = Query(sql, MySqlTypeMapper)
+  val DefaultMapper = new DefaultRowMapper(MySqlColumnMapper)
 
-  override def informationQuery(schema: String): Query = query(
+  def query(sql: String) = Query(sql, DefaultMapper)
+
+  override def informationQuery(schema: String): Query[RowValues] = query(
     """
       |SELECT `table_name`, `column_name`, `data_type`
       |FROM INFORMATION_SCHEMA.COLUMNS

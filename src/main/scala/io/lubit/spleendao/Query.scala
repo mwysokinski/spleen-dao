@@ -2,20 +2,45 @@ package io.lubit.spleendao
 
 import java.sql.{Connection, PreparedStatement, ResultSet}
 
-import io.lubit.spleendao.Query.Params
+import io.lubit.spleendao.Query._
 
 import scala.collection.immutable.List
 import scala.collection.mutable.ListBuffer
 
-case class Query(sql: String, mapper: TypeMapper, params: Option[Params] = None) {
+case class Query[T](sql: String, mapper: RowMapper[T], params: Option[Params] = None) {
 
-  def execute(implicit connection: Connection) = Query.execute(this)
+  def execute(implicit connection: Connection): QueryResult[T] = {
+    val resultSet = statement.executeQuery()
+    val columns = rowColumns(resultSet)
 
-  def executeUpdate(implicit connection: Connection) = Query.executeUpdate(this)
+    QueryResult(
+      columns = columns,
+      values = resultSetValues(resultSet, columns, mapper)
+    )
+  }
 
-  def withParams(params: Params): Query = copy(params = Some(params))
+  def executeUpdate(implicit connection: Connection): Int = statement.executeUpdate
 
-  def withParams(params: (String, Any)*): Query = copy(params = Some(Map(params: _*)))
+  def withParams(params: Params): Query[T] = copy(params = Some(params))
+
+  def withParams(params: (String, Any)*): Query[T] = copy(params = Some(Map(params: _*)))
+
+
+  def statement(implicit connection: Connection) = {
+    val sqlNoParams = sql.replaceAll(ParamsPattern.regex, "?")
+    val statement = connection.prepareStatement(sqlNoParams)
+
+    params.foreach { params =>
+      ParamsPattern.findAllMatchIn(sql).zipWithIndex.foreach { case (param, index) =>
+        params.get(param.group(1)).foreach { value =>
+          setParam(statement, index + 1, value)
+        }
+      }
+    }
+
+    statement
+  }
+
 }
 
 object Query {
@@ -40,7 +65,7 @@ object Query {
                     nullable: Boolean,
                     precision: Long)
 
-  case class QueryResult(columns: RowColumns, values: List[RowValues]) {
+  case class QueryResult[T](columns: RowColumns, values: List[T]) {
 
     def print: Unit = {
       println("--------------------------------")
@@ -51,7 +76,7 @@ object Query {
       println("--------------------------------")
 
       values.foreach { row =>
-        println(row.mkString("|"))
+        println(row)
       }
 
       println("--------------------------------")
@@ -59,36 +84,6 @@ object Query {
 
   }
 
-  def execute(query: Query)(implicit connection: Connection): QueryResult = {
-    val resultSet = statement(query).executeQuery()
-    val columns = rowColumns(resultSet)
-
-    QueryResult(
-      columns = columns,
-      values = resultSetValues(resultSet, columns, query.mapper)
-    )
-  }
-
-  def executeUpdate(query: Query)(implicit connection: Connection): Int = {
-    val res = statement(query).executeUpdate()
-    connection.close()
-    res
-  }
-
-  def statement(query: Query)(implicit connection: Connection) = {
-    val sqlNoParams = query.sql.replaceAll(ParamsPattern.regex, "?")
-    val statement = connection.prepareStatement(sqlNoParams)
-
-    query.params.foreach { params =>
-      ParamsPattern.findAllMatchIn(query.sql).zipWithIndex.foreach { case (param, index) =>
-        params.get(param.group(1)).foreach { value =>
-          setParam(statement, index + 1, value)
-        }
-      }
-    }
-
-    statement
-  }
 
   def rowColumns(resultSet: ResultSet): RowColumns = {
     val rsmd = resultSet.getMetaData
@@ -107,26 +102,12 @@ object Query {
     }
   }
 
-  def wrapResult(resultSet: ResultSet, column: Query.Column, result: Any): Any = {
-    if (column.nullable) {
-      if (resultSet.wasNull()) None else Some(result)
-    } else {
-      result
-    }
-  }
 
-  def rowValues(resultSet: ResultSet, columns: RowColumns, mapper: TypeMapper): RowValues = {
-    columns.map { column =>
-      wrapResult(resultSet, column, mapper.convert(resultSet, column))
-    }
-  }
-
-
-  def resultSetValues(resultSet: ResultSet, columns: RowColumns, mapper: TypeMapper): List[RowValues] = {
-    val result = new ListBuffer[RowValues]
+  def resultSetValues[T](resultSet: ResultSet, columns: RowColumns, mapper: RowMapper[T]): List[T] = {
+    val result = new ListBuffer[T]
 
     while (resultSet.next()) {
-      result += rowValues(resultSet, columns, mapper)
+      result += mapper.convert(resultSet, columns)
     }
 
     result.toList

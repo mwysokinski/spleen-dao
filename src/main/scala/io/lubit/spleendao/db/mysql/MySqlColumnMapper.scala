@@ -2,9 +2,10 @@ package io.lubit.spleendao.db.mysql
 
 import java.sql.ResultSet
 
-import io.lubit.spleendao.{Query, TypeMapper}
+import io.lubit.spleendao.ColumnMapper.DefaultColumnMapper
+import io.lubit.spleendao.Query
 
-object MySqlTypeMapper extends TypeMapper {
+object MySqlColumnMapper extends DefaultColumnMapper {
 
   val BinaryToUUID = true
 

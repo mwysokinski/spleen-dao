@@ -4,6 +4,7 @@ import java.sql.Connection
 import java.util.concurrent.{Executors, TimeUnit}
 
 import io.lubit.spleendao.DataSource._
+import io.lubit.spleendao.Query.RowValues
 import org.apache.commons.dbcp2.BasicDataSource
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,16 +34,19 @@ class DataSource(config: DataSourceConfig) {
 
   private implicit val ec = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(config.poolSize))
 
-  private implicit val mapper = TypeMapper(config.databaseType)
+  private val columnMapper = ColumnMapper(config.databaseType)
+  private val rowMapper = new DefaultRowMapper(columnMapper)
 
   def withConnection[T](body: Connection => T): Future[T] = Future {
     val connection = pool.getConnection
-    val res = body(connection)
-    connection.close()
-    res
+    try {
+      body(connection)
+    } finally {
+      connection.close()
+    }
   }
 
-  def query(sql: String): Query = Query(sql, mapper)
+  def query(sql: String): Query[RowValues] = Query(sql, rowMapper)
 
   def shutdown: Unit = {
     Thread.sleep(1000)
