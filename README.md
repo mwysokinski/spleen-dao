@@ -6,6 +6,36 @@ separate thread pool to execute statements in async way.
 
 Disclaimer: Project is in early stage.
 
+### Database support
+For the time being Spleen supports MySQL and PostgreSQL however not all types are mapped yet.
+
+### Defining datasource
+
+* MySQL
+```
+  val config = DataSourceConfig(
+    driver = "com.mysql.jdbc.Driver",
+    jdbcUrl = "jdbc:mysql://localhost:3306/your_db",
+    user = "user",
+    password = "***",
+    poolSize = 1,
+    databaseType = DatabaseTypes.MySQL
+  )
+
+```
+
+* PostgreSQL
+```
+  val config = DataSourceConfig(
+    driver = "org.postgresql.Driver",
+    jdbcUrl = "jdbc:postgresql://localhost:5432/your_db",
+    user = "user",
+    password = "***",
+    poolSize = 1,
+    databaseType = DatabaseTypes.PostgreSQL
+  )
+
+```
 ### Query (select) usage
 ```
     val ds = new DataSource(config)
@@ -88,6 +118,4 @@ Retrieves info about defined tables/columns
 
 ```
 
-### Database support
-For the time being Spleen supports MySQL and PostgreSQL however not all types are mapped yet.
 

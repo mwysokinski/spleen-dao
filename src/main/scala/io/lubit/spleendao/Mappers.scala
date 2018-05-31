@@ -24,6 +24,14 @@ trait ColumnMapper[T] {
 
   @inline def int(index: Int)(implicit resultSet: ResultSet): Int = resultSet.getInt(index)
 
+  @inline def bigdec(index: Int)(implicit resultSet: ResultSet): BigDecimal = resultSet.getBigDecimal(index)
+
+  @inline def date(index: Int)(implicit resultSet: ResultSet): java.sql.Date = resultSet.getDate(index)
+
+  @inline def time(index: Int)(implicit resultSet: ResultSet): java.sql.Time = resultSet.getTime(index)
+
+  @inline def timestamp(index: Int)(implicit resultSet: ResultSet): java.sql.Timestamp = resultSet.getTimestamp(index)
+
   @inline def str(index: Int)(implicit resultSet: ResultSet): String = resultSet.getString(index)
 
 }
