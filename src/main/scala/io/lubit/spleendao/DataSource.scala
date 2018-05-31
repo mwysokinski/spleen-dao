@@ -5,6 +5,7 @@ import java.util.concurrent.{Executors, TimeUnit}
 
 import io.lubit.spleendao.DataSource._
 import io.lubit.spleendao.Query.RowValues
+import io.lubit.spleendao.dto.InformationSchemaDto
 import org.apache.commons.dbcp2.BasicDataSource
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,6 +35,7 @@ class DataSource(config: DataSourceConfig) {
 
   private implicit val ec = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(config.poolSize))
 
+  private val dbSpecificQueries = DbSpecificQueries(config.databaseType)
   private val columnMapper = ColumnMapper(config.databaseType)
   private val rowMapper = new DefaultRowMapper(columnMapper)
 
@@ -47,6 +49,8 @@ class DataSource(config: DataSourceConfig) {
   }
 
   def query(sql: String): Query[RowValues] = Query(sql, rowMapper)
+
+  def informationQuery(schema: String): Query[InformationSchemaDto] = dbSpecificQueries.informationQuery(schema)
 
   def shutdown: Unit = {
     Thread.sleep(1000)

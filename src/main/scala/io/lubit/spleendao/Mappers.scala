@@ -7,6 +7,7 @@ import java.util.UUID
 import io.lubit.spleendao.ColumnMapper.DefaultColumnMapper
 import io.lubit.spleendao.Query.{RowColumns, RowValues}
 import io.lubit.spleendao.db.mysql.MySqlColumnMapper
+import io.lubit.spleendao.dto.InformationSchemaDto
 
 trait ColumnMapper[T] {
   def convert(resultSet: ResultSet, column: Query.Column): T
@@ -22,6 +23,7 @@ trait RowMapper[T] {
   def convert(resultSet: ResultSet, columns: RowColumns): T
 }
 
+trait InformationSchemaMapper extends RowMapper[InformationSchemaDto]
 
 class DefaultRowMapper(mapper: DefaultColumnMapper) extends RowMapper[RowValues] {
 
@@ -48,6 +50,7 @@ object ColumnMapper {
   def apply(databaseType: DatabaseType): DefaultColumnMapper = databaseType match {
     case DatabaseTypes.MySQL => MySqlColumnMapper
 
-    case other => throw new Exception(s"Mapper for ${other} not defined!")
+    case other => throw new Exception(s"DefaultColumnMapper for ${other} not defined!")
   }
+
 }

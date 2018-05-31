@@ -25,6 +25,7 @@ case class Query[T](sql: String, mapper: RowMapper[T], params: Option[Params] = 
 
   def withParams(params: (String, Any)*): Query[T] = copy(params = Some(Map(params: _*)))
 
+  def withMapper[S](mapper: RowMapper[S]): Query[S] = copy(mapper = mapper)
 
   def statement(implicit connection: Connection) = {
     val sqlNoParams = sql.replaceAll(ParamsPattern.regex, "?")

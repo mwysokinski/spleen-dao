@@ -3,7 +3,9 @@ package io.lubit.spleendao.db.mysql
 import java.sql.ResultSet
 
 import io.lubit.spleendao.ColumnMapper.DefaultColumnMapper
-import io.lubit.spleendao.Query
+import io.lubit.spleendao.Query.RowColumns
+import io.lubit.spleendao.dto.InformationSchemaDto
+import io.lubit.spleendao.{InformationSchemaMapper, Query}
 
 object MySqlColumnMapper extends DefaultColumnMapper {
 
@@ -32,5 +34,16 @@ object MySqlColumnMapper extends DefaultColumnMapper {
 
     case _ => resultSet.getString(column.index)
 
+  }
+}
+
+object MySqlInformationSchemaMapper extends InformationSchemaMapper {
+
+  override def convert(resultSet: ResultSet, columns: RowColumns): InformationSchemaDto = {
+    InformationSchemaDto(
+      tableName = resultSet.getString(1),
+      columnName = resultSet.getString(2),
+      dataType = resultSet.getString(3)
+    )
   }
 }
