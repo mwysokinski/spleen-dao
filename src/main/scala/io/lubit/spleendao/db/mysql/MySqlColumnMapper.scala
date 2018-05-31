@@ -11,29 +11,32 @@ object MySqlColumnMapper extends DefaultColumnMapper {
 
   val BinaryToUUID = true
 
-  override def convert(resultSet: ResultSet, column: Query.Column): Any = column.sqlType.toUpperCase match {
-    case "BINARY" =>
-      val res = resultSet.getBytes(column.index)
+  override def convert(column: Query.Column)(implicit resultSet: ResultSet): Any = {
 
-      // uuid
-      if (BinaryToUUID && !resultSet.wasNull() && res.length == 16) fromByteArray(res) else res
+    column.sqlType.toUpperCase match {
+      case "BINARY" =>
+        val res = bytes(column.index)
 
-    case "INT" | "INT UNSIGNED" => resultSet.getInt(column.index)
+        // uuid
+        if (BinaryToUUID && !resultSet.wasNull() && res.length == 16) fromByteArray(res) else res
 
-    case "TINYINT" => resultSet.getBoolean(column.index)
+      case "INT" | "INT UNSIGNED" => resultSet.getInt(column.index)
 
-    case "DECIMAL UNSIGNED" | "DECIMAL" => resultSet.getBigDecimal(column.index)
+      case "TINYINT" => bool(column.index)
 
-    case "DATE" | "DATETIME" => resultSet.getDate(column.index)
+      case "DECIMAL UNSIGNED" | "DECIMAL" => resultSet.getBigDecimal(column.index)
 
-    case "TIME" => resultSet.getTime(column.index)
+      case "DATE" | "DATETIME" => resultSet.getDate(column.index)
 
-    case "TIMESTAMP" => resultSet.getTimestamp(column.index)
+      case "TIME" => resultSet.getTime(column.index)
 
-    case "VARCHAR" => resultSet.getString(column.index)
+      case "TIMESTAMP" => resultSet.getTimestamp(column.index)
 
-    case _ => resultSet.getString(column.index)
+      case "VARCHAR" => str(column.index)
 
+      case _ => resultSet.getString(column.index)
+
+    }
   }
 }
 

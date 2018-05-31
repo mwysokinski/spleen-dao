@@ -1,6 +1,6 @@
 # Spleen DAO
 
-This is a simple data access object written in Scala, using JDBC.
+This is a simple JDBC wrapper written in Scala.
 Project uses [dbcp2](https://commons.apache.org/proper/commons-dbcp/) connection pool and 
 separate thread pool to execute statements in async way.
 
@@ -75,4 +75,19 @@ Disclaimer: Project is in early stage.
     }
 
 ```
+
+### Schema information
+Retrieves info about defined tables/columns
+
+```
+    val query = ds.informationQuery("test")
+
+    ds.withConnection { implicit connection =>
+      query.values
+    } foreach (_.map(_.toString).foreach(println(_)))
+
+```
+
+### Database support
+For the time being Spleen supports MySQL and PostgreSQL however not all types are mapped yet.
 

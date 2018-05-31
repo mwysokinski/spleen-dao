@@ -9,7 +9,7 @@ import io.lubit.spleendao.{InformationSchemaMapper, Query}
 
 object PostgreSqlColumnMapper extends DefaultColumnMapper {
 
-  override def convert(resultSet: ResultSet, column: Query.Column): Any = column.sqlType.toLowerCase match {
+  override def convert(column: Query.Column)(implicit resultSet: ResultSet): Any = column.sqlType.toLowerCase match {
 
     case "boolean" => resultSet.getBoolean(column.index)
     case "character" => resultSet.getString(column.index)

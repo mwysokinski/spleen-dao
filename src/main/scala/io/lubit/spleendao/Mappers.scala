@@ -11,12 +11,20 @@ import io.lubit.spleendao.db.postgresql.PostgreSqlColumnMapper
 import io.lubit.spleendao.dto.InformationSchemaDto
 
 trait ColumnMapper[T] {
-  def convert(resultSet: ResultSet, column: Query.Column): T
+  def convert(column: Query.Column)(implicit resultSet: ResultSet): T
 
   def fromByteArray(array: Array[Byte]): UUID = {
     val bb: ByteBuffer = ByteBuffer.wrap(array)
     new UUID(bb.getLong(), bb.getLong())
   }
+
+  @inline def bool(index: Int)(implicit resultSet: ResultSet): Boolean = resultSet.getBoolean(index)
+
+  @inline def bytes(index: Int)(implicit resultSet: ResultSet): Array[Byte] = resultSet.getBytes(index)
+
+  @inline def int(index: Int)(implicit resultSet: ResultSet): Int = resultSet.getInt(index)
+
+  @inline def str(index: Int)(implicit resultSet: ResultSet): String = resultSet.getString(index)
 
 }
 
@@ -38,7 +46,7 @@ class DefaultRowMapper(mapper: DefaultColumnMapper) extends RowMapper[RowValues]
 
   override def convert(resultSet: ResultSet, columns: RowColumns): RowValues = {
     columns.map { column =>
-      wrapResult(resultSet, column, mapper.convert(resultSet, column))
+      wrapResult(resultSet, column, mapper.convert(column)(resultSet))
     }
 
   }
@@ -56,3 +64,4 @@ object ColumnMapper {
   }
 
 }
+
